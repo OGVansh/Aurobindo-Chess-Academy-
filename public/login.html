@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurobindo Chess Academy | Luxury Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
+        .glass { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(14px); border: 1px solid rgba(250, 204, 21, 0.15); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-slate-100 p-4">
+
+    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl transition-all duration-500">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-yellow-400 tracking-wider">AUROBINDO</h1>
+            <p class="text-xs uppercase tracking-widest text-slate-400 mt-1">Chess Academy Portal</p>
+        </div>
+
+        <div id="loginSection">
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Academy Approved Email</label>
+                    <input type="email" id="loginEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-yellow-400 transition text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Secret Password</label>
+                    <input type="password" id="loginPassword" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-yellow-400 transition text-slate-100">
+                </div>
+                <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-950 font-bold py-3 rounded-lg shadow-lg hover:shadow-yellow-400/20 transition-all duration-300">
+                    AUTHORIZE SIGN IN
+                </button>
+            </form>
+            <p class="text-center text-sm text-slate-400 mt-6">
+                New student? <a href="#" onclick="toggleAuth(false)" class="text-yellow-400 hover:underline">Request Access</a>
+            </p>
+        </div>
+
+        <div id="registerSection" class="hidden">
+            <form id="registerForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Full Name</label>
+                    <input type="text" id="regName" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 transition text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Pre-approved Email Address</label>
+                    <input type="email" id="regEmail" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 transition text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Choose Password</label>
+                    <input type="password" id="regPassword" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 transition text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Avatar Image URL (Optional)</label>
+                    <input type="url" id="regPhoto" placeholder="https://example.com/photo.jpg" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 transition text-slate-100">
+                </div>
+                <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-yellow-400 border border-yellow-400/30 font-bold py-3 rounded-lg transition-all duration-300">
+                    SUBMIT ACCESS REQUEST
+                </button>
+            </form>
+            <p class="text-center text-sm text-slate-400 mt-6">
+                Already registered? <a href="#" onclick="toggleAuth(true)" class="text-yellow-400 hover:underline">Log In</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleAuth(showLogin) {
+            document.getElementById('loginSection').classList.toggle('hidden', !showLogin);
+            document.getElementById('registerSection').classList.toggle('hidden', showLogin);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                alert(data.error);
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const photo = document.getElementById('regPhoto').value;
+
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, photo })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(data.success);
+                toggleAuth(true);
+            } else {
+                alert(data.error);
+            }
+        });
+    </script>
+</body>
+</html>
