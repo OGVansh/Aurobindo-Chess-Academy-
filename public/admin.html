@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Control Panel | Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
+        .card { background-color: #1e293b; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="text-slate-100 flex min-h-screen">
+
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-6">
+        <div>
+            <div class="flex items-center space-x-3 mb-10">
+                <div class="w-3 h-3 rounded-full bg-yellow-400 animate-pulse"></div>
+                <h2 class="text-lg font-bold tracking-wider text-yellow-400">ADMIN CONTROL</h2>
+            </div>
+            <nav class="space-y-2">
+                <button onclick="switchTab('editor')" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm font-medium">🌐 Website Editor</button>
+                <button onclick="switchTab('students')" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm font-medium">👨‍🎓 Student Manager</button>
+                <button onclick="switchTab('attendance')" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm font-medium">📅 Attendance Logs</button>
+                <button onclick="switchTab('rankings')" class="w-full text-left px-4 py-2.5 rounded-lg hover:bg-slate-800 transition text-sm font-medium">🏆 Dynamic Rankings</button>
+            </nav>
+        </div>
+        <button onclick="logout()" class="w-full bg-red-900/40 border border-red-800 text-red-300 py-2 rounded-lg text-sm font-semibold hover:bg-red-900/60 transition">Sign Out</button>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto">
+        
+        <div id="tab-editor" class="tab-view space-y-6">
+            <h1 class="text-2xl font-bold text-yellow-400">Live Academy Configuration Editor</h1>
+            <div class="card p-6 rounded-xl space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Homepage Core Content Header</label>
+                    <textarea id="homeText" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-yellow-400 text-slate-100"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">About Academy Summary Section</label>
+                    <textarea id="aboutText" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-yellow-400 text-slate-100"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Contact & Location Information Layout</label>
+                    <input type="text" id="contactInfo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-yellow-400 text-slate-100">
+                </div>
+                <button onclick="saveContent()" class="bg-yellow-400 hover:bg-yellow-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition">SAVE WEB LAYOUT</button>
+            </div>
+        </div>
+
+        <div id="tab-students" class="tab-view hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-yellow-400">Academy Approvals & Verification</h1>
+                <div class="flex space-x-2">
+                    <input type="email" id="allowedEmailInput" placeholder="Pre-approve Student Email" class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-100 focus:outline-none focus:border-yellow-400">
+                    <button onclick="addAllowedEmail()" class="bg-yellow-400 text-slate-950 px-4 py-2 text-sm font-bold rounded-lg transition hover:bg-yellow-500">+ ADD</button>
+                </div>
+            </div>
+            
+            <div class="card p-6 rounded-xl">
+                <h3 class="text-lg font-bold mb-4 text-slate-300">Pending Registrations & Members</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-400">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs">
+                            <tr>
+                                <th class="p-3">Avatar</th>
+                                <th class="p-3">Student Name</th>
+                                <th class="p-3">Email Address</th>
+                                <th class="p-3">Account State</th>
+                                <th class="p-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-attendance" class="tab-view hidden space-y-6">
+            <h1 class="text-2xl font-bold text-yellow-400">Mark Smart Roll Call Attendance</h1>
+            <div class="card p-6 rounded-xl space-y-4">
+                <div class="flex space-x-4 items-center">
+                    <input type="date" id="attendanceDate" class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-100">
+                    <button onclick="submitAttendance()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2 rounded-lg text-sm transition">LOG TODAY'S ATTENDANCE</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs">
+                            <tr>
+                                <th class="p-3">Student</th>
+                                <th class="p-3">Status Option</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceMarkBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-rankings" class="tab-view hidden space-y-6">
+            <h1 class="text-2xl font-bold text-yellow-400">Dynamic Score Dashboard (Top 10 Leaderboard)</h1>
+            <div class="card p-6 rounded-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-400">
+                        <thead class="bg-slate-900 text-slate-300 uppercase text-xs">
+                            <tr>
+                                <th class="p-3">Rank No.</th>
+                                <th class="p-3">Student</th>
+                                <th class="p-3">Matches</th>
+                                <th class="p-3">W / D / L</th>
+                                <th class="p-3">Avg Accuracy</th>
+                                <th class="p-3 text-yellow-400">Calculated Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            if(tabId === 'students') loadStudents();
+            if(tabId === 'attendance') loadAttendanceInterface();
+            if(tabId === 'rankings') loadLeaderboard();
+        }
+
+        async function loadContent() {
+            const res = await fetch('/api/admin/content');
+            const data = await res.json();
+            document.getElementById('homeText').value = data.homepage_text || '';
+            document.getElementById('aboutText').value = data.about_text || '';
+            document.getElementById('contactInfo').value = data.contact_info || '';
+        }
+
+        async function saveContent() {
+            const homepage_text = document.getElementById('homeText').value;
+            const about_text = document.getElementById('aboutText').value;
+            const contact_info = document.getElementById('contactInfo').value;
+            
+            const res = await fetch('/api/admin/content', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ homepage_text, about_text, contact_info })
+            });
+            const data = await res.json();
+            alert(data.success || data.error);
+        }
+
+        async function addAllowedEmail() {
+            const email = document.getElementById('allowedEmailInput').value;
+            if(!email) return;
+            const res = await fetch('/api/admin/allowed-emails', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            alert(data.success);
+            document.getElementById('allowedEmailInput').value = '';
+        }
+
+        let currentStudentsCache = [];
+        async function loadStudents() {
+            const res = await fetch('/api/admin/students');
+            currentStudentsCache = await res.json();
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+            
+            currentStudentsCache.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-800 hover:bg-slate-800/30 transition";
+                tr.innerHTML = `
+                    <td class="p-3"><img src="${student.photo}" class="w-8 h-8 rounded-full border border-yellow-400/20"></td>
+                    <td class="p-3 font-semibold text-slate-200">${student.name}</td>
+                    <td class="p-3 text-slate-400">${student.email}</td>
+                    <td class="p-3">${student.approved ? '<span class="text-green-400 bg-green-950/40 px-2 py-0.5 rounded border border-green-800 text-xs">Approved</span>' : '<span class="text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800 text-xs">Pending</span>'}</td>
+                    <td class="p-3 text-right space-x-2">
+                        ${!student.approved ? `<button onclick="studentAction(${student.id}, 'approve')" class="text-xs bg-green-600 text-white font-bold px-2.5 py-1 rounded hover:bg-green-500">Approve</button>` : ''}
+                        <button onclick="studentAction(${student.id}, 'delete')" class="text-xs bg-red-900/60 text-red-300 font-bold px-2.5 py-1 rounded hover:bg-red-800">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function studentAction(studentId, action) {
+            const res = await fetch('/api/admin/students/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId, action })
+            });
+            loadStudents();
+        }
+
+        function loadAttendanceInterface() {
+            document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
+            const tbody = document.getElementById('attendanceMarkBody');
+            tbody.innerHTML = '';
+            
+            currentStudentsCache.forEach(s => {
+                if(!s.approved) return;
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-800";
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-200 font-medium">${s.name}</td>
+                    <td class="p-3">
+                        <select data-uid="${s.id}" class="att-status bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200">
+                            <option value="present">Present</option>
+                            <option value="absent">Absent</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function submitAttendance() {
+            const date = document.getElementById('attendanceDate').value;
+            const records = [];
+            document.querySelectorAll('.att-status').forEach(el => {
+                records.push({
+                    user_id: el.getAttribute('data-uid'),
+                    status: el.value
+                });
+            });
+
+            const res = await fetch('/api/admin/attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, records })
+            });
+            alert((await res.json()).success);
+        }
+
+        async function loadLeaderboard() {
+            const res = await fetch('/api/admin/rankings');
+            const data = await res.json();
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((s, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-800";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold ${idx === 0 ? 'text-yellow-400 text-lg' : 'text-slate-400'}">${idx + 1}</td>
+                    <td class="p-3 flex items-center space-x-3">
+                        <img src="${s.photo}" class="w-7 h-7 rounded-full">
+                        <span class="font-medium text-slate-200">${s.name}</span>
+                    </td>
+                    <td class="p-3">${s.total_matches}</td>
+                    <td class="p-3 text-xs text-slate-400">${s.wins}W / ${s.draws}D / ${s.losses}L</td>
+                    <td class="p-3 text-teal-400 font-semibold">${s.accuracy}%</td>
+                    <td class="p-3 font-extrabold text-yellow-400">${s.score}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout');
+            window.location.href = '/';
+        }
+
+        // Initialize Load
+        loadContent();
+    </script>
+</body>
+  </html>
+  
